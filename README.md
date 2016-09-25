@@ -6,6 +6,8 @@ The colours are then displayed.
 
 This is an javascript version experiment for the [Brank Canvas](https://github.com/hannako/blank_canvas) Project.
 
+With this, the photo and colors can be displayed very quickly without being sent to the backend (Rails).
+
 ## Current Status
 - unstyled
 - It works

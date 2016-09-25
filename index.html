@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Color Test</title>
+
+  <style>
+    #canvas {
+      height: 300px;
+      background: gray;
+    }
+    ul#mainColors {
+      list-style:none;
+    }
+
+    #dominantColor {
+      height: 40px;
+      width: 100px;
+    }
+    ul#mainColors li {
+      height: 40px;
+      display: inline-block;
+    }
+
+
+  </style>
+  </head>
+  <body>
+    <input type="file" id="file_upload">
+
+    <canvas id="canvas"></canvas>
+
+    <div id="dominantColor">Dominant Color</div>
+    <ul id="mainColors">
+    </ul>
+
+    <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+    <script src="color-thief.js"></script>
+
+    <script type="text/javascript">
+
+      $("#file_upload").change(function (e) {
+        var F = this.files[0];
+        var reader = new FileReader();
+        reader.onload = imageIsLoaded;
+        reader.readAsDataURL(F);
+      });
+
+      function imageIsLoaded(e) {
+        var img = new Image();
+        img.onload = function(){
+          var canvas = $('#canvas')[0];
+          var context = canvas.getContext('2d');
+          canvas.width  = this.width;
+          canvas.height = this.height;
+          context.drawImage(this, 0, 0);
+
+          showDominantColor();
+          appendMainColors();
+
+        };
+        img.src = e.target.result;
+      }
+
+      function rgbToHex(R, G, B) {
+        return toHex(R) + toHex(G) + toHex(B);
+      }
+
+      function toHex(n) {
+        n = parseInt(n, 10);
+        if (isNaN(n))  return "00";
+        n = Math.max(0, Math.min(n, 255));
+        return "0123456789ABCDEF".charAt((n - n % 16) / 16)  + "0123456789ABCDEF".charAt(n % 16);
+      }
+
+      function showDominantColor() {
+        var colorThief = new ColorThief();
+        var dominantColorRGB = colorThief.getColor(canvas);
+        var R = dominantColorRGB[0];
+        var G = dominantColorRGB[1];
+        var B = dominantColorRGB[2];
+        var dominantColorHex = rgbToHex(R,G,B);
+        $("#dominantColor").html(dominantColorHex).css("background", "#"+dominantColorHex);
+      }
+
+      function appendMainColors() {
+        $('ul#mainColors').empty();
+        var colorThief = new ColorThief();
+        var mainColorsRGB = colorThief.getPalette(canvas, 10);
+        console.log('mainColorsRGB:', mainColorsRGB);
+        mainColorsRGB.forEach(function(mainClrRGB){
+          var R = mainClrRGB[0];
+          var G = mainClrRGB[1];
+          var B = mainClrRGB[2];
+          var mainClrHex = rgbToHex(R,G,B);
+          $('ul#mainColors').append("<li style='background-color:#"+mainClrHex+";'>"+mainClrHex+"</li>");
+        });
+
+      }
+    </script>
+  </body>
+</html>
